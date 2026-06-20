@@ -1,8 +1,8 @@
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
   background: #111;
   color: #eee;
+  font-family: system-ui, sans-serif;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -13,16 +13,10 @@ body {
   background: #222;
 }
 
-h1 {
-  margin: 0 0 8px;
-  font-size: 20px;
-}
-
 .controls {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  align-items: center;
 }
 
 label {
@@ -31,25 +25,21 @@ label {
   font-size: 14px;
 }
 
-input[type="range"] {
-  width: 150px;
+input, select {
+  padding: 4px;
+  font-size: 14px;
 }
 
 button {
   padding: 8px 16px;
   background: #4caf50;
   border: none;
-  color: #fff;
+  color: white;
   border-radius: 4px;
-  font-size: 14px;
-}
-
-button:active {
-  transform: scale(0.97);
 }
 
 #gameCanvas {
   flex: 1;
-  display: block;
   background: #1a1a1a;
+  display: block;
 }
