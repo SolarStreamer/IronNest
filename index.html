@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Iron Nest – Heavy Artillery Simulator</title>
+  <title>Iron Nest – Map Missions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="ui">
-    <h1>Iron Nest</h1>
-    <div class="controls">
-      <label>
-        Angle:
-        <input type="range" id="angle" min="10" max="80" value="45" />
-        <span id="angleValue">45°</span>
-      </label>
-      <label>
-        Power:
-        <input type="range" id="power" min="10" max="60" value="30" />
-        <span id="powerValue">30</span>
-      </label>
-      <button id="fireBtn">Fire</button>
-    </div>
+
+<div id="ui">
+  <h1>Iron Nest – Mission Control</h1>
+
+  <div class="missionBox">
+    <p><strong>Mission:</strong> Hit target at <span id="missionCoords"></span></p>
   </div>
 
-  <canvas id="gameCanvas"></canvas>
+  <div class="controls">
+    <label>Angle:
+      <input type="number" id="angleInput" value="45" />
+    </label>
 
-  <script src="main.js"></script>
+    <label>Power:
+      <input type="number" id="powerInput" value="30" />
+    </label>
+
+    <label>Shell Type:
+      <select id="shellType">
+        <option value="light">Light Shell</option>
+        <option value="medium">Medium Shell</option>
+        <option value="heavy">Heavy Shell</option>
+      </select>
+    </label>
+
+    <button id="fireBtn">Fire</button>
+    <button id="newMissionBtn">New Mission</button>
+  </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script src="main.js"></script>
 </body>
 </html>
