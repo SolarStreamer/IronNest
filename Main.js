@@ -1,96 +1,95 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const angleSlider = document.getElementById("angle");
-const powerSlider = document.getElementById("power");
-const angleValue = document.getElementById("angleValue");
-const powerValue = document.getElementById("powerValue");
-const fireBtn = document.getElementById("fireBtn");
-
 let width, height;
-let projectiles = [];
-
-const gravity = 9.8; // simple gravity
-
 function resizeCanvas() {
   width = window.innerWidth;
   height = window.innerHeight - document.getElementById("ui").offsetHeight;
   canvas.width = width;
   canvas.height = height;
 }
-window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 // Cannon position (bottom-left)
-const cannon = {
-  x: 80,
-  y: height - 40
+const cannon = { x: 80, y: height - 80 };
+
+// Mission target
+let target = { x: 0, y: 0 };
+
+// Shell types (fictional, game-safe)
+const shellStats = {
+  light: { gravity: 7 },
+  medium: { gravity: 9 },
+  heavy: { gravity: 12 }
 };
 
-angleSlider.addEventListener("input", () => {
-  angleValue.textContent = angleSlider.value + "°";
-});
+// UI elements
+const angleInput = document.getElementById("angleInput");
+const powerInput = document.getElementById("powerInput");
+const shellType = document.getElementById("shellType");
+const fireBtn = document.getElementById("fireBtn");
+const newMissionBtn = document.getElementById("newMissionBtn");
+const missionCoords = document.getElementById("missionCoords");
 
-powerSlider.addEventListener("input", () => {
-  powerValue.textContent = powerSlider.value;
-});
+let projectiles = [];
 
-fireBtn.addEventListener("click", () => {
-  fireProjectile();
-});
+function newMission() {
+  target.x = Math.random() * (width - 200) + 200;
+  target.y = Math.random() * (height - 200) + 50;
 
-function fireProjectile() {
-  const angleDeg = parseFloat(angleSlider.value);
-  const power = parseFloat(powerSlider.value);
+  missionCoords.textContent = `(${Math.floor(target.x)}, ${Math.floor(target.y)})`;
+}
+newMission();
 
-  const angleRad = (angleDeg * Math.PI) / 180;
+newMissionBtn.onclick = newMission;
 
-  const speed = power; // simple mapping
-  const vx = Math.cos(angleRad) * speed;
-  const vy = -Math.sin(angleRad) * speed; // negative because canvas y grows downward
+fireBtn.onclick = () => {
+  const angle = parseFloat(angleInput.value);
+  const power = parseFloat(powerInput.value);
+  const shell = shellType.value;
+
+  const rad = (angle * Math.PI) / 180;
 
   projectiles.push({
     x: cannon.x,
     y: cannon.y,
-    vx,
-    vy,
+    vx: Math.cos(rad) * power,
+    vy: -Math.sin(rad) * power,
+    gravity: shellStats[shell].gravity,
     t: 0
   });
-}
+};
 
 function update(dt) {
-  // Update projectiles
   projectiles.forEach(p => {
     p.t += dt;
     p.x += p.vx;
-    p.y += p.vy + gravity * p.t; // crude gravity effect
+    p.y += p.vy + p.gravity * p.t;
   });
 
-  // Remove projectiles that leave screen
-  projectiles = projectiles.filter(p => p.x >= 0 && p.x <= width && p.y <= height);
+  projectiles = projectiles.filter(p => p.x < width && p.y < height);
+}
+
+function drawMap() {
+  ctx.fillStyle = "#333";
+  ctx.fillRect(0, height - 40, width, 40);
 }
 
 function drawCannon() {
-  ctx.save();
-  ctx.translate(cannon.x, cannon.y);
-
-  const angleDeg = parseFloat(angleSlider.value);
-  const angleRad = (-angleDeg * Math.PI) / 180;
-
-  ctx.rotate(angleRad);
-
   ctx.fillStyle = "#ccc";
-  ctx.fillRect(0, -8, 60, 16); // barrel
+  ctx.fillRect(cannon.x - 20, cannon.y, 40, 20);
+}
 
-  ctx.restore();
-
-  // base
-  ctx.fillStyle = "#888";
-  ctx.fillRect(cannon.x - 20, cannon.y, 40, 10);
+function drawTarget() {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(target.x, target.y, 10, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawProjectiles() {
-  ctx.fillStyle = "#ffeb3b";
+  ctx.fillStyle = "yellow";
   projectiles.forEach(p => {
     ctx.beginPath();
     ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
@@ -98,12 +97,22 @@ function drawProjectiles() {
   });
 }
 
-function drawGround() {
-  ctx.fillStyle = "#333";
-  ctx.fillRect(0, height - 30, width, 30);
-}
+let last = 0;
+function loop(ts) {
+  const dt = (ts - last) / 1000;
+  last = ts;
 
-let lastTime = 0;
+  ctx.clearRect(0, 0, width, height);
+
+  update(dt);
+  drawMap();
+  drawCannon();
+  drawTarget();
+  drawProjectiles();
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);let lastTime = 0;
 function loop(timestamp) {
   const dt = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
