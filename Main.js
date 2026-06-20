@@ -11,20 +11,23 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Cannon position (bottom-left)
-const cannon = { x: 80, y: height - 80 };
+// Map settings
+const gridSize = 50;
 
-// Mission target
+// Cannon position on map
+const cannon = { x: 100, y: height - 100 };
+
+// Target
 let target = { x: 0, y: 0 };
 
-// Shell types (fictional, game-safe)
+// Shell types (fictional)
 const shellStats = {
-  light: { gravity: 7 },
+  light: { gravity: 6 },
   medium: { gravity: 9 },
   heavy: { gravity: 12 }
 };
 
-// UI elements
+// UI
 const angleInput = document.getElementById("angleInput");
 const powerInput = document.getElementById("powerInput");
 const shellType = document.getElementById("shellType");
@@ -35,8 +38,8 @@ const missionCoords = document.getElementById("missionCoords");
 let projectiles = [];
 
 function newMission() {
-  target.x = Math.random() * (width - 200) + 200;
-  target.y = Math.random() * (height - 200) + 50;
+  target.x = Math.random() * (width - 200) + 150;
+  target.y = Math.random() * (height - 200) + 100;
 
   missionCoords.textContent = `(${Math.floor(target.x)}, ${Math.floor(target.y)})`;
 }
@@ -71,14 +74,30 @@ function update(dt) {
   projectiles = projectiles.filter(p => p.x < width && p.y < height);
 }
 
-function drawMap() {
-  ctx.fillStyle = "#333";
-  ctx.fillRect(0, height - 40, width, 40);
+function drawGrid() {
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 1;
+
+  for (let x = 0; x < width; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+
+  for (let y = 0; y < height; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
 }
 
 function drawCannon() {
-  ctx.fillStyle = "#ccc";
-  ctx.fillRect(cannon.x - 20, cannon.y, 40, 20);
+  ctx.fillStyle = "#4caf50";
+  ctx.beginPath();
+  ctx.arc(cannon.x, cannon.y, 12, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawTarget() {
@@ -104,6 +123,15 @@ function loop(ts) {
 
   ctx.clearRect(0, 0, width, height);
 
+  drawGrid();
+  drawCannon();
+  drawTarget();
+  update(dt);
+  drawProjectiles();
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
   update(dt);
   drawMap();
   drawCannon();
