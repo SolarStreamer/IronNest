@@ -14,7 +14,7 @@ window.addEventListener("resize", resizeCanvas);
 // Map settings
 const gridSize = 50;
 
-// Cannon position on map
+// Cannon position
 const cannon = { x: 100, y: height - 100 };
 
 // Target
@@ -34,9 +34,12 @@ const shellType = document.getElementById("shellType");
 const fireBtn = document.getElementById("fireBtn");
 const newMissionBtn = document.getElementById("newMissionBtn");
 const missionCoords = document.getElementById("missionCoords");
+const mapBtn = document.getElementById("mapBtn");
 
 let projectiles = [];
+let showMap = false;
 
+// Create new mission
 function newMission() {
   target.x = Math.random() * (width - 200) + 150;
   target.y = Math.random() * (height - 200) + 100;
@@ -47,6 +50,13 @@ newMission();
 
 newMissionBtn.onclick = newMission;
 
+// Toggle map
+mapBtn.onclick = () => {
+  showMap = !showMap;
+  mapBtn.textContent = showMap ? "Hide Map" : "Show Map";
+};
+
+// Fire projectile
 fireBtn.onclick = () => {
   const angle = parseFloat(angleInput.value);
   const power = parseFloat(powerInput.value);
@@ -107,6 +117,19 @@ function drawTarget() {
   ctx.fill();
 }
 
+function drawDistanceInfo() {
+  const dx = target.x - cannon.x;
+  const dy = cannon.y - target.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  ctx.fillStyle = "white";
+  ctx.font = "18px Arial";
+  ctx.fillText(`Distance: ${Math.floor(distance)} units`, 20, 30);
+
+  const suggestedAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+  ctx.fillText(`Suggested Angle: ${Math.floor(suggestedAngle)}°`, 20, 60);
+}
+
 function drawProjectiles() {
   ctx.fillStyle = "yellow";
   projectiles.forEach(p => {
@@ -123,36 +146,16 @@ function loop(ts) {
 
   ctx.clearRect(0, 0, width, height);
 
-  drawGrid();
-  drawCannon();
-  drawTarget();
+  if (showMap) {
+    drawGrid();
+    drawCannon();
+    drawTarget();
+    drawDistanceInfo();
+  }
+
   update(dt);
   drawProjectiles();
 
   requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
-  update(dt);
-  drawMap();
-  drawCannon();
-  drawTarget();
-  drawProjectiles();
-
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);let lastTime = 0;
-function loop(timestamp) {
-  const dt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-
-  ctx.clearRect(0, 0, width, height);
-
-  update(dt);
-  drawGround();
-  drawCannon();
-  drawProjectiles();
-
-  requestAnimationFrame(loop);
-}
-
 requestAnimationFrame(loop);
